@@ -119,7 +119,7 @@ vec3 sky(vec3 d){
   // Broad procedural cloud bands also provide readable glass reflections.
   float clouds=sin(d.x*11.0+d.z*5.0)+sin(d.z*19.0-d.x*3.0)*0.45;
   c+=vec3(0.12)*smoothstep(0.6,1.35,clouds)*smoothstep(0.0,0.25,d.y);
-  float strip=exp(-pow((d.x+0.5*d.z-0.2)*8.0,2.0));
+  float band=(d.x+0.5*d.z-0.2)*8.0,strip=exp(-band*band);
   c+=vec3(0.25,0.32,0.40)*strip*smoothstep(0.1,0.5,d.y);
   return c;
 }
@@ -148,7 +148,7 @@ vec3 ground(vec3 p,vec3 rd,float distanceToEye,bool detailed){
   vec3 base=mix(vec3(0.095,0.14,0.18),vec3(0.64,0.69,0.70),check);
   float sh=detailed?shadow(p+vec3(0.0,0.005,0.0)):1.0;
   vec3 c=base*(vec3(0.20,0.26,0.34)+vec3(0.78,0.72,0.60)*sh);
-  c=mix(c,sky(reflect(rd,vec3(0,1,0))),0.06+0.15*pow(1.0-abs(rd.y),5.0));
+  c=mix(c,sky(reflect(rd,vec3(0,1,0))),0.06+0.15*pow(clamp(1.0-abs(rd.y),0.0,1.0),5.0));
   // Each caustic spot is the actual floor endpoint of a Snell-traced spectral ray.
   for(int i=2;i<19;i+=2){
     vec2 delta=p.xz-uB[i].xz;
